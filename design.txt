@@ -1,0 +1,3 @@
+I need to write a Windows python program that will: 1. Show a windows standard tree view in its main window, with keyboard collapsible/expandable leaves. 2. The ability to, from the keyboard, add a leaf to the current level, or create a new level from any existing leaf. and 3. Copy, cut, and paste leaves between levels, or simply delete them with the delete key or a remove item on the context menu. It should use a JSON map of leaves as storage backing for now, saved in "%appdata%\simpleTD\simpleTD.json".
+
+Can you change all uses of the insert key, to Ctrl+N? Also, which dependencies do I need to have pip bring in for this?
