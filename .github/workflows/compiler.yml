@@ -1,0 +1,102 @@
+# https://help.github.com/en/actions/configuring-and-managing-workflows/configuring-a-workflow#creating-a-workflow-file
+# https://docs.github.com/en/actions/reference/events-that-trigger-workflows#scheduled-events-schedule
+name: Compilation
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  push:
+    branches-ignore: [master]
+  workflow_dispatch:
+
+jobs:
+  win64:
+    timeout-minutes: 20
+    # Need 2022 because latest (2025) doesn't include nsis.
+    runs-on: windows-2022
+    steps:
+#      - name: Download and Install nsProcess Plugin
+#        shell: powershell
+#        run: |
+#          $url = "https://www.dropbox.com/scl/fi/6hanw64xveklq8r0easx0/nsProcess_1_6.7z?rlkey=q383zrkxpf791lepi2gdlmz38&dl=1"
+#          $zipFile = "D:\nsProcess.7z"
+#          $tempDir = "D:\nsProcess_Temp"
+#          # Get the directory where makensis is located
+#          $NSIS_EXE = Get-Command makensis | Select-Object -ExpandProperty Source
+#          $NSISDir = Split-Path -Path $NSIS_EXE -Parent
+#          # Note: If makensis is in the \Bin subfolder, go up one more level
+#          if ($NSISDir.EndsWith("\Bin")) {
+#              $NSISDir = Split-Path -Path $NSISDir -Parent
+#          }
+#          New-Item -ItemType Directory -Force -Path $tempDir
+#          Invoke-WebRequest -Uri $url -OutFile $zipFile
+#          D:
+#          cd \
+#          Get-ChildItem -Recurse -Exclude "a\_actions*" -Name
+#          7z x "$zipFile" -o"$tempDir" -y
+#          Get-ChildItem -Recurse -Exclude "a\_actions*" -Name
+#          Copy-Item -Path "$tempDir\Include\nsProcess.nsh" -Destination "$NSISDir\Include\"
+#          Copy-Item -Path "$tempDir\Plugin\nsProcessW.dll" -Destination "$NSISDir\Plugins\x86-unicode\nsProcess.dll"
+
+      - name: Preconfigure git
+        run: git config --global advice.detachedHead false
+      - name: Checkout repo
+        uses: actions/checkout@main  # checkout the repository content to github runner.
+
+      - name: Install Python and cached deps
+        uses: actions/setup-python@main
+        with:
+          python-version: 3.13
+          cache: 'pip'
+      - name: Install deps
+        run: python -m pip install -r requirements.txt
+
+#      - name: Get current app version
+#        run: python -c "import about; print(about.VERSION_STRING)" > currentVersionNumber.txt
+#      - name: Build version file
+#        shell: cmd
+#        run: pyivf-make_version --source-format yaml --metadata-source versionData.yml --outfile versionData.txt
+
+      - name: Compile
+        shell: cmd
+        run: >-
+          pyinstaller --name="SimpleToDo"
+          simpleTD.pyw
+          --one-file
+
+#      - name: Create installer
+#        shell: cmd
+#        run: makensis /P4 /V2 install.nsi
+
+#      - name: Create an ssh tunnel to the runner
+#        continue-on-error: true
+#        uses: lexbritvin/ssh-session-action@v1
+#        with:
+#          use-bore: 'true'
+#          use-actor-ssh-keys: 'false'
+#          ssh-server-authorized-keys: ${{ secrets.SSH_PUBLIC_KEYS }}
+#          bore-server: ${{ vars.BORE_SERVER }}:${{ vars.BORE_PORT }}
+#          bore-secret: ${{ secrets.BORE_SECRET }}
+#          ssh-server-port: 22
+#          wait-timeout: 1800
+#          detached: "false"
+#      - name: Second try at boring
+#        run: D:\a\_temp\bin\bore.exe local 22 --to ${{ vars.BORE_SERVER }} --port ${{ vars.BORE_PORT }} --secret ${{ secrets.BORE_SECRET }}
+
+      - name: Upload app setup executable
+        uses: actions/upload-artifact@main
+        with:
+          name: setup
+          path: dist/simpleTD/simpleTD.exe
+          retention-days: 2
+          if-no-files-found: error
+          compression-level: 0
+      - name: Upload current compiler script
+        uses: actions/upload-artifact@main
+        with:
+          name: spec
+          path: "*.spec"
+          retention-days: 2
+          if-no-files-found: ignore
