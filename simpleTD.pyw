@@ -159,8 +159,8 @@ class TreeViewApp:
         """Bind keyboard shortcuts."""
         self.tree.bind('<Left>', self._on_collapse)
         self.tree.bind('<Right>', self._on_expand)
-        self.tree.bind('<Insert>', self._on_insert_sibling)
-        self.tree.bind('<Shift-Insert>', self._on_insert_child)
+        self.tree.bind('<Control-n>', self._on_insert_sibling)
+        self.tree.bind('<Control-Shift-n>', self._on_insert_child)
         self.tree.bind('<Delete>', self._on_delete)
         self.tree.bind('<Control-c>', self._on_copy)
         self.tree.bind('<Control-x>', self._on_cut)
@@ -385,8 +385,8 @@ class TreeViewApp:
         self.tree.selection_set(item_id)
         
         menu = tk.Menu(self.root, tearoff=False)
-        menu.add_command(label="Add Sibling (Insert)", command=lambda: self._on_insert_sibling(None))
-        menu.add_command(label="Add Child (Shift+Insert)", command=lambda: self._on_insert_child(None))
+        menu.add_command(label="Add Sibling (Ctrl+N)", command=lambda: self._on_insert_sibling(None))
+        menu.add_command(label="Add Child (Ctrl+Shift+N)", command=lambda: self._on_insert_child(None))
         menu.add_separator()
         menu.add_command(label="Copy (Ctrl+C)", command=lambda: self._on_copy(None))
         menu.add_command(label="Cut (Ctrl+X)", command=lambda: self._on_cut(None))
