@@ -186,16 +186,15 @@ class TreeViewApp:
     def _on_insert_sibling(self, event):
         """Insert a new sibling at the same level (Insert key)."""
         item_id = self._get_selected_item()
+        # If nothing is selected, add to root level
         if not item_id:
-            messagebox.showinfo("Info", "Please select an item first.")
-            return
-        
-        parent_node = self.data_manager.find_parent_by_child_id(item_id)
-        if not parent_node:
-            messagebox.showerror("Error", "Cannot find parent node.")
-            return
-        
-        # Create a simple dialog for the new item text
+            parent_node = self.data_manager.root
+        else:
+            parent_node = self.data_manager.find_parent_by_child_id(item_id)
+            if not parent_node:
+                messagebox.showerror("Error", "Cannot find parent node.")
+                return
+
         text = self._ask_for_text("Add New Item", "Enter item text:")
         if text:
             new_node = TreeNode(
@@ -204,13 +203,17 @@ class TreeViewApp:
                 children=[]
             )
             self.next_id_counter += 1
-            
-            # Find index of current item and insert after it
-            current_index = parent_node.children.index(
-                self.data_manager.find_node_by_id(item_id)
-            )
-            parent_node.children.insert(current_index + 1, new_node)
-            
+        
+            if item_id:
+                # Insert after the selected item
+                current_index = parent_node.children.index(
+                    self.data_manager.find_node_by_id(item_id)
+                )
+                parent_node.children.insert(current_index + 1, new_node)
+            else:
+                # No selection: append to root
+                parent_node.children.append(new_node)
+        
             self.data_manager.save()
             self._load_tree_to_widget()
             self.status_var.set(f"Added new item: {text}")
