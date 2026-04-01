@@ -85,6 +85,9 @@ jobs:
 #      - name: Second try at boring
 #        run: D:\a\_temp\bin\bore.exe local 22 --to ${{ vars.BORE_SERVER }} --port ${{ vars.BORE_PORT }} --secret ${{ secrets.BORE_SECRET }}
 
+      - name: debug file locations
+        run: dir /s /b
+
       - name: Upload app setup executable
         uses: actions/upload-artifact@main
         with:
