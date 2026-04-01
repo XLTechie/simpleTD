@@ -93,8 +93,8 @@ jobs:
         uses: actions/upload-artifact@main
         with:
           name: setup
-          path: dist/simpleTD/simpleTD.exe
-          retention-days: 2
+          path: dist\SimpleToDo.exe
+          retention-days: 1
           if-no-files-found: error
           compression-level: 0
       - name: Upload current compiler script
