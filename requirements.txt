@@ -1,0 +1,3 @@
+pyinstaller==6.17.0
+pyinstaller_versionfile==3.0.1
+#wxPython==4.2.4
